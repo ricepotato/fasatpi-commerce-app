@@ -9,6 +9,15 @@ meta = MetaData()
 # engine = create_async_engine("sqlite+aiosqlite://", echo=True)
 
 
+def get_async_engine(url: str, echo: bool = False):
+    engine = create_async_engine(url, echo=echo)
+    return engine
+
+
+def get_session_maker(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
+    return async_sessionmaker(engine, expire_on_commit=False)
+
+
 async def get_session(
     async_session: async_sessionmaker[AsyncSession],
 ) -> AsyncGenerator[AsyncSession, None]:
@@ -21,3 +30,13 @@ async def get_session(
             raise e
         finally:
             await session.close()
+
+
+async def create_tables(engine: AsyncEngine):
+    async with engine.begin() as conn:
+        await conn.run_sync(meta.create_all)
+
+
+async def drop_tables(engine: AsyncEngine):
+    async with engine.begin() as conn:
+        await conn.run_sync(meta.drop_all)
