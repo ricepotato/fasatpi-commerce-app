@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from app.enums.entity_status import EntityStatus
@@ -33,3 +33,15 @@ class BaseModel(Base):
 
     def is_deleted(self):
         return self.status == EntityStatus.DELETED.value
+
+
+class Product(BaseModel):
+    __tablename__ = "product"
+
+    name: Mapped[str] = mapped_column(String(255))
+    thumbnail_url: Mapped[str] = mapped_column(String(500))
+    description: Mapped[str] = mapped_column(Text)
+    short_description: Mapped[str] = mapped_column(Text)
+    cost_price: Mapped[int] = mapped_column(Integer)
+    sales_price: Mapped[int] = mapped_column(Integer)
+    discount_price: Mapped[int] = mapped_column(Integer)
