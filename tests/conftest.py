@@ -5,7 +5,7 @@ from app.storage import db
 from app.storage.repository import product
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def sqlite_engine():
     DB_FILE = "sqlite_test.db"
     if os.path.exists(DB_FILE):
@@ -15,12 +15,19 @@ def sqlite_engine():
     engine = db.get_async_engine(url, echo=True)
     asyncio.run(db.create_tables(engine))
     yield engine
-    asyncio.run(db.drop_tables(engine))
 
 
 @pytest.fixture(scope="function")
-def sqlite_session_maker(sqlite_engine):
-    yield db.get_session_maker(sqlite_engine)
+def sqlite_memory_engine():
+    url = "sqlite+aiosqlite:///:memory:"
+    engine = db.get_async_engine(url, echo=True)
+    asyncio.run(db.create_tables(engine))
+    yield engine
+
+
+@pytest.fixture(scope="function")
+def sqlite_session_maker(sqlite_memory_engine):
+    yield db.get_session_maker(sqlite_memory_engine)
 
 
 @pytest.fixture(scope="function")
