@@ -20,7 +20,9 @@ class BaseModelMixin:
     __mapper_args__ = {"always_refresh": True}
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    status: Mapped[str] = mapped_column(String(20), default=EntityStatus.ACTIVE.value)
+    status: Mapped[str] = mapped_column(
+        String(20), default=EntityStatus.ACTIVE.value, index=True
+    )
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.datetime.now
     )
