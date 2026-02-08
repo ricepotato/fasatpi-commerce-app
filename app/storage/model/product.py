@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, Text
 
-from app.storage.model.base import BaseModel
+from app.storage.model import base
 
 
-class Product(BaseModel):
+class Product(base.Base, base.BaseModelMixin):
     __tablename__ = "product"
 
     name: Mapped[str] = mapped_column(String(255))

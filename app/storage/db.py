@@ -1,9 +1,18 @@
-from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy import create_engine, Engine
+from sqlalchemy.orm import sessionmaker
 from typing import AsyncGenerator
 
-from app.storage.model.base import Base
+from app.storage import model
+
+
+def get_engine(url: str, echo: bool = False):
+    return create_engine(url, echo=echo)
+
+
+def get_sessionmaker(engine: Engine):
+    return sessionmaker(engine, expire_on_commit=False)
 
 
 def get_async_engine(url: str, echo: bool = False):
@@ -16,9 +25,9 @@ def get_session_maker(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
 
 
 async def get_session(
-    async_session: async_sessionmaker[AsyncSession],
+    async_session_maker: async_sessionmaker[AsyncSession],
 ) -> AsyncGenerator[AsyncSession, None]:
-    async with async_session.begin() as session:
+    async with async_session_maker.begin() as session:
         try:
             yield session
             await session.commit()
@@ -31,9 +40,9 @@ async def get_session(
 
 async def create_tables(engine: AsyncEngine):
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(model.base.Base.metadata.create_all)
 
 
 async def drop_tables(engine: AsyncEngine):
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(model.base.Base.metadata.drop_all)

@@ -1,6 +1,6 @@
 import enum
 
 
-class EntityStatus(enum.Enum):
+class EntityStatus(enum.StrEnum):
     ACTIVE = "ACTIVE"
     DELETED = "DELETED"
